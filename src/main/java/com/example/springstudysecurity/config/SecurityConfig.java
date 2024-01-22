@@ -2,6 +2,8 @@ package com.example.springstudysecurity.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -16,6 +18,15 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+    //권한 계층 설정
+    @Bean
+    public RoleHierarchy roleHierarchy(){
+        RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
+
+        roleHierarchy.setHierarchy("ROLE_ADMIN > ROLE_USER\n");
+
+        return roleHierarchy;
+    }
     //권한필터 메소드
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
@@ -23,7 +34,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests((auth)-> auth
                         .requestMatchers("/","/login","/loginProc","/join","/joinProc").permitAll()
                         .requestMatchers("/admin").hasRole("ADMIN")
-                        .requestMatchers("/my/**").hasAnyRole("ADMIN","USER")
+                        .requestMatchers("/my/**").hasAnyRole("USER")
                         .anyRequest().authenticated()
         );
 
