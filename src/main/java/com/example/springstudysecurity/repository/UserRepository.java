@@ -1,3 +1,4 @@
+/*
 package com.example.springstudysecurity.repository;
 
 import com.example.springstudysecurity.entity.UserEntity;
@@ -9,3 +10,4 @@ public interface UserRepository extends JpaRepository<UserEntity,Integer> {
 
     UserEntity findByUsername(String username);
 }
+*/

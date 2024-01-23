@@ -1,3 +1,4 @@
+/*
 package com.example.springstudysecurity.dto;
 
 import com.example.springstudysecurity.entity.UserEntity;
@@ -55,3 +56,4 @@ public class CustomUserDetails implements UserDetails {
         return true;
     }
 }
+*/
