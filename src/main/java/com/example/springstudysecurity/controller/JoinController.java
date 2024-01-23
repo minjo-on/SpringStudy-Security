@@ -1,4 +1,3 @@
-/*
 package com.example.springstudysecurity.controller;
 
 import com.example.springstudysecurity.dto.JoinDTO;
@@ -27,4 +26,3 @@ public class JoinController {
         return "redirect:/login";
     }
 }
-*/
