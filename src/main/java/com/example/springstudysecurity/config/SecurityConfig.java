@@ -19,14 +19,14 @@ public class SecurityConfig {
     }
 
     //권한 계층 설정
-    @Bean
+    /*@Bean
     public RoleHierarchy roleHierarchy(){
         RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
 
         roleHierarchy.setHierarchy("ROLE_ADMIN > ROLE_USER\n");
 
         return roleHierarchy;
-    }
+    }*/
     //권한필터 메소드
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
