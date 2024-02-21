@@ -101,6 +101,13 @@ public class SecurityConfig {
                         .userDetailsService(userDetailsService)
                 );
 
+        http.
+                sessionManagement((sessionManagement) -> sessionManagement
+                        .sessionFixation().changeSessionId()
+                        .maximumSessions(1)
+                        .maxSessionsPreventsLogin(true)
+                );
+
         return http.build();
     }
 }
