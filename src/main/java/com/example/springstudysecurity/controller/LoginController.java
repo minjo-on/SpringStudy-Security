@@ -5,18 +5,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class LoginController {
-    @GetMapping("/login")
-    public String loginP(){
-        return "login";
+    @GetMapping("/loginPage")
+    public String loginPage(){
+        return "loginPage";
     }
-/*
-    @PostMapping("/loginProc")
-    public String loginProc(){
-        if(){
-            return "redirect:/";
-        }
 
-        return "redirect:/main";
-    }*/
-
+    @GetMapping("/")
+    public String mainP() {return "main";}
 }

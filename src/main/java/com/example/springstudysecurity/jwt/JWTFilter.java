@@ -1,3 +1,4 @@
+/*
 package com.example.springstudysecurity.jwt;
 
 import com.example.springstudysecurity.dto.CustomUserDetails;
@@ -37,7 +38,6 @@ public class JWTFilter extends OncePerRequestFilter {
         if(jwtUtil.isExpired(token)){
             System.out.println("token expired");
             filterChain.doFilter(request,response);
-
             return;
         }
 
@@ -57,3 +57,4 @@ public class JWTFilter extends OncePerRequestFilter {
         filterChain.doFilter(request,response);
     }
 }
+*/

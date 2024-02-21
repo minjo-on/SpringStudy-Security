@@ -1,25 +1,38 @@
 package com.example.springstudysecurity.config;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
-//@Configuration
-//@EnableWebSecurity
+import java.io.IOException;
+
+@Configuration
+@EnableWebSecurity
 public class SecurityConfig {
-    //비밀번호 암호화 메소드
-    //@Bean
-    public BCryptPasswordEncoder bCryptPasswordEncoder(){
-        return new BCryptPasswordEncoder();
-    }
 
+    @Autowired
+    UserDetailsService userDetailsService;
+
+    //비밀번호 암호화 메소드
     //권한 계층 설정
-    //@Bean
+    @Bean
     public RoleHierarchy roleHierarchy(){
         RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
 
@@ -28,37 +41,65 @@ public class SecurityConfig {
         return roleHierarchy;
     }
     //권한필터 메소드
-    //@Bean
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         http
                 .authorizeHttpRequests((auth)-> auth
-                        .requestMatchers("/","/login","/loginProc","/join","/joinProc").permitAll()
-                        .requestMatchers("/admin").hasRole("ADMIN")
-                        .requestMatchers("/my/**").hasAnyRole("USER")
                         .anyRequest().authenticated()
-        );
 
-        http
-                .formLogin((auth)->auth.loginPage("/login")
-                        .loginProcessingUrl("/loginProc")
-                        .permitAll()
-        );
-
-        http
-                .sessionManagement((auth)->auth
-                        .maximumSessions(1)
-                        .maxSessionsPreventsLogin(true));
-
-        http
-                .sessionManagement((auth) -> auth
-                        .sessionFixation((sessionFixation) -> sessionFixation
-                                .changeSessionId()
-                        )
                 );
 
         http
-                .logout((auth)->auth.logoutUrl("/logout")
-                        .logoutSuccessUrl("/"));
+                .formLogin((formLogin)->formLogin
+                        //.loginPage("/loginPage")
+                        .defaultSuccessUrl("/")
+                        .failureUrl("/loginPage")
+                        .usernameParameter("userId")
+                        .passwordParameter("passwd")
+                        .loginProcessingUrl("/login_proc")
+                        .successHandler(new AuthenticationSuccessHandler() {
+                            @Override
+                            public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+                                System.out.println("authentication" + authentication.getName());
+                                response.sendRedirect("/");
+                            }
+                        })
+                        .failureHandler(new AuthenticationFailureHandler() {
+                            @Override
+                            public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
+                                System.out.println("exception" + exception.getMessage());
+                                response.sendRedirect("/login");
+                            }
+                        })
+                        .permitAll()
+                );
+
+        http
+                .logout((logout) -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login")
+                        .addLogoutHandler(new LogoutHandler() {
+                            @Override
+                            public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+                                HttpSession session = request.getSession();
+                                session.invalidate();
+                            }
+                        })
+                        .logoutSuccessHandler(new LogoutSuccessHandler() {
+                            @Override
+                            public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+                                response.sendRedirect("/login");
+                            }
+                        })
+                        .deleteCookies("remember-me")
+                );
+
+        http
+                .rememberMe((rememberMe)->rememberMe
+                        .rememberMeParameter("remember")
+                        .tokenValiditySeconds(3600)
+                        .userDetailsService(userDetailsService)
+                );
 
         return http.build();
     }

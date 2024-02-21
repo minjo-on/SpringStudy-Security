@@ -1,3 +1,4 @@
+/*
 package com.example.springstudysecurity.entity;
 
 import jakarta.persistence.*;
@@ -14,3 +15,4 @@ public class UserEntity {
     private String password;
     private String role;
 }
+*/

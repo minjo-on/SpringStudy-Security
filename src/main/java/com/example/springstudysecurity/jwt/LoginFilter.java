@@ -1,3 +1,4 @@
+/*
 package com.example.springstudysecurity.jwt;
 
 import com.example.springstudysecurity.dto.CustomUserDetails;
@@ -49,7 +50,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         String role = auth.getAuthority();
 
-        String token = jwtUtil.createJwt(username, role, 60*60*10L);
+        String token = jwtUtil.createJwt(username, role, 60*60*100L);
 
         response.addHeader("Authorization", "Bearer " + token);
     }
@@ -61,3 +62,4 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         response.setStatus(401);
     }
 }
+*/
