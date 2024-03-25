@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -37,31 +36,6 @@ public class SecurityConfig {
 
         return roleHierarchy;
     }
-
-    @Bean
-    public UserDetailsService users(){
-        String password = passwordEncoder().encode("1111");
-
-        UserDetails user = User.builder()
-                .username("user")
-                .password(password)
-                .roles("USER")
-                .build();
-
-        UserDetails sys = User.builder()
-                .username("manager")
-                .password(password)
-                .roles("MANAGER")
-                .build();
-
-        UserDetails admin = User.builder()
-                .username("admin")
-                .password(password)
-                .roles("ADMIN")
-                .build();
-
-        return new InMemoryUserDetailsManager(user,sys,admin);
-    }
     @Bean
     public PasswordEncoder passwordEncoder(){
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
@@ -72,7 +46,7 @@ public class SecurityConfig {
 
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/").permitAll()
+                        .requestMatchers("/","/users").permitAll()
                         .requestMatchers("/mypage").hasRole("USER")
                         .requestMatchers("/messages").hasRole("MANAGER")
                         .requestMatchers("/config").hasRole("ADMIN")
