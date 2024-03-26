@@ -1,24 +1,28 @@
 package com.example.springstudysecurity.security.configs;
 
+import com.example.springstudysecurity.security.provider.CustomAuthenticationProvider;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
+import org.springframework.security.authentication.AuthenticationDetailsSource;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final UserDetailsService userDetailsService;
+    private final AuthenticationDetailsSource authenticationDetailsSource;
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -37,8 +41,13 @@ public class SecurityConfig {
         return roleHierarchy;
     }
     @Bean
-    public PasswordEncoder passwordEncoder(){
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    public BCryptPasswordEncoder passwordEncoder(){
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationProvider authenticationProvider(){
+        return new CustomAuthenticationProvider(userDetailsService);
     }
 
     @Bean
@@ -46,7 +55,7 @@ public class SecurityConfig {
 
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/","/users").permitAll()
+                        .requestMatchers("/","/users","user/login/**").permitAll()
                         .requestMatchers("/mypage").hasRole("USER")
                         .requestMatchers("/messages").hasRole("MANAGER")
                         .requestMatchers("/config").hasRole("ADMIN")
@@ -55,7 +64,15 @@ public class SecurityConfig {
 
         http
                 .formLogin((formLogin) -> formLogin
-                        .permitAll());
+                        .loginPage("/login")
+                        .loginProcessingUrl("/login_proc")
+                        .defaultSuccessUrl("/")
+                        .authenticationDetailsSource(authenticationDetailsSource)
+                        .permitAll()
+                );
+
+        http
+                .authenticationProvider(authenticationProvider());
 
 
         return http.build();
