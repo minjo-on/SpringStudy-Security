@@ -1,5 +1,6 @@
 package com.example.springstudysecurity.security.configs;
 
+import com.example.springstudysecurity.security.handler.CustomAccessDeniedHandler;
 import com.example.springstudysecurity.security.provider.CustomAuthenticationProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -15,6 +16,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
@@ -34,6 +36,13 @@ public class SecurityConfig {
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations());
     }
 
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler(){
+        CustomAccessDeniedHandler accessDeniedHandler = new CustomAccessDeniedHandler();
+        accessDeniedHandler.setErrorPage("/denied");
+
+        return accessDeniedHandler;
+    }
     //권한 계층 설정
     @Bean
     public RoleHierarchy roleHierarchy(){
@@ -80,6 +89,9 @@ public class SecurityConfig {
         http
                 .authenticationProvider(authenticationProvider());
 
+        http
+                .exceptionHandling((handling) -> handling
+                        .accessDeniedHandler(accessDeniedHandler()));
 
         return http.build();
     }
