@@ -13,6 +13,6 @@ public class FormWebAuthenticationDetails extends WebAuthenticationDetails {
 
     public FormWebAuthenticationDetails(HttpServletRequest request) {
         super(request);
-        String secretKey = request.getParameter("secret_key");
+        secretKey= request.getParameter("secret_key");
     }
 }

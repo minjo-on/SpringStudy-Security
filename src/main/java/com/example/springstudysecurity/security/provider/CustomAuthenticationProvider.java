@@ -28,17 +28,17 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         AccountContext accountContext = (AccountContext) userDetailsService.loadUserByUsername(username);
 
         if(!bCryptPasswordEncoder().matches(password, accountContext.getAccount().getPassword())){
-            throw new BadCredentialsException("BadCredentialsException");
+            throw new BadCredentialsException("Invaild password");
         }
 
         FormWebAuthenticationDetails formWebAuthenticationDetails = (FormWebAuthenticationDetails) authentication.getDetails();
         String secretKey = formWebAuthenticationDetails.getSecretKey();
 
-        if(secretKey == null || "secret".equals(secretKey)){
+        if(secretKey == null || !"secret".equals(secretKey)){
             throw new InsufficientAuthenticationException("insufficientAuthenticationException");
         }
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(accountContext.getAccount(),null,accountContext.getAuthorities());
-        return authenticationToken;
+
+        return new UsernamePasswordAuthenticationToken(accountContext.getAccount(),null,accountContext.getAuthorities());
     }
 
     @Override
